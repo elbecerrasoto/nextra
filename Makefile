@@ -1,3 +1,7 @@
+.PHONY neighbors:
+neighbors:
+	Rscript get_neighbors.R
+
 .PHONY data:
 data:
 	./download_genome.py -i gff3 protein genome 'seq-report' cds -p GCF_000699465.1_bsubJH642 GCF_000699465.1

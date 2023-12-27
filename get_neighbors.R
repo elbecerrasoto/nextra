@@ -27,9 +27,9 @@ Rgff::get_features(GFF)
 # https://stackoverflow.com/questions/49374887/piping-the-removal-of-empty-columns-using-dplyr # remove NA columns
 CDS <- segmenTools::gff2tab(GFF) |>
   tibble() |>
-  filter(feature == "CDS") |> 
-  select_if(function(x) !(all(is.na(x)) | all(x==""))) |> 
-  relocate(gene, locus_tag, start, end, feature) |> 
+  filter(feature == "CDS") |>
+  select_if(function(x) !(all(is.na(x)) | all(x == ""))) |>
+  relocate(gene, locus_tag, start, end, feature) |>
   arrange(start)
 
 print(head(CDS))
