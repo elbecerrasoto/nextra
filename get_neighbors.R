@@ -12,33 +12,24 @@
 
 library(tidyverse)
 library(stringr)
+library(segmenTools)
+# devtools::install_github("raim/segmenTools")
 
+N <- 2^3
 GFF <- "GCF_000699465.1/GCF_000699465.1_bsubJH642.gff"
 
-CDS <- microseq::readGFF(GFF) |> filter(Type == "CDS")
+# CDS <- microseq::readGFF(GFF) |> filter(Type == "CDS") |> arrange(Start)
 
+Rgff::check_gff(GFF)
 Rgff::gff_stats(GFF)
 Rgff::get_features(GFF)
 
+# https://stackoverflow.com/questions/49374887/piping-the-removal-of-empty-columns-using-dplyr # remove NA columns
+CDS <- segmenTools::gff2tab(GFF) |>
+  tibble() |>
+  filter(feature == "CDS") |> 
+  select_if(function(x) !(all(is.na(x)) | all(x==""))) |> 
+  relocate(gene, locus_tag, start, end, feature) |> 
+  arrange(start)
 
-CDS_ATTS_HEADERS <- c(
-  "ID",
-  "Parent",
-  "Dbxref",
-  "Name",
-  "Ontology_term",
-  "gbkey",
-  "gene",
-  "go_component",
-  "go_function",
-  "go_process",
-  "inference",
-  "locus_tag",
-  "procuct",
-  "protein_id",
-  "transl_table"
-)
-
-
-# attributes targets
-# str_detect("hello", "llo")
+print(head(CDS))
