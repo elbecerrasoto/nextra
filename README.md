@@ -1,5 +1,10 @@
--   Run
+# Run
 
-#+begin_src shell make data make neighbors #+end_src
+``` shell
+make data
+make neighbors
+```
 
--   TODOs \*\* TODO create environment for dev
+# TODOs
+
+## [TODO]{.todo .TODO} create environment for dev {#create-environment-for-dev}

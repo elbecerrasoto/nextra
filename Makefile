@@ -12,4 +12,5 @@ style:
 	black ./
 
 README.md: README.org
-	pandoc -f gfm -o README.md README.org
+	pandoc -o README.md README.org
+	# pandoc -f gfm -o README.md README.org
