@@ -80,6 +80,7 @@ parser.add_argument(
     ],
     help=f"Which formats to download, Default: {INCLUDE_DEF}",
 )
+parser.add_argument("-p", "--particle", help="Rename particle, Default: genome NCBI accession")
 parser.add_argument(
     "-r",
     "--no-rename",
@@ -91,35 +92,36 @@ args = parser.parse_args()
 
 
 GENOME = args.genome
+PARTICLE = GENOME if args.particle is None else args.particle
 
 RENAMES = {
     "genome": (
         r1 := re.compile(GENOME + r"_.*_genomic\.fna$"),
-        lambda x: re.sub(r1, f"{GENOME}.fna", x),
+        lambda x: re.sub(r1, f"{PARTICLE}.fna", x),
     ),
     "cds": (
         r2 := re.compile(r"cds_from_genomic\.fna$"),
-        lambda x: re.sub(r2, f"{GENOME}_cds.fna", x),
+        lambda x: re.sub(r2, f"{PARTICLE}_cds.fna", x),
     ),
     "gbff": (
         r3 := re.compile(r"genomic\.gbff$"),
-        lambda x: re.sub(r3, f"{GENOME}.gbff", x),
+        lambda x: re.sub(r3, f"{PARTICLE}.gbff", x),
     ),
     "gff3": (
         r4 := re.compile(r"genomic\.gff$"),
-        lambda x: re.sub(r4, f"{GENOME}.gff", x),
+        lambda x: re.sub(r4, f"{PARTICLE}.gff", x),
     ),
     "gtf": (
         r5 := re.compile(r"genomic\.gtf$"),
-        lambda x: re.sub(r5, f"{GENOME}.gtf", x),
+        lambda x: re.sub(r5, f"{PARTICLE}.gtf", x),
     ),
     "protein": (
         r6 := re.compile(r"protein\.faa$"),
-        lambda x: re.sub(r6, f"{GENOME}.faa", x),
+        lambda x: re.sub(r6, f"{PARTICLE}.faa", x),
     ),
     "sequence-report": (
         r7 := re.compile(r"sequence_report\.jsonl$"),
-        lambda x: re.sub(r7, f"{GENOME}.jsonl", x),
+        lambda x: re.sub(r7, f"{PARTICLE}.jsonl", x),
     ),
 }
 
