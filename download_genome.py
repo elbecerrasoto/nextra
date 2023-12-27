@@ -5,6 +5,7 @@
 # mamba install -y -c conda-forge ncbi-datasets-cli
 
 import os
+import shutil 
 import argparse
 import subprocess as sp
 from pathlib import Path
@@ -47,7 +48,7 @@ args = parser.parse_args()
 
 
 GENOME = args.genome
-OUT_DIR = CWD / f"temp_{GENOME}" if args.out_dir is None else Path(args.out_dir)
+OUT_DIR = CWD / GENOME if args.out_dir is None else Path(args.out_dir)
 INCLUDE = INCLUDE_DEF if args.include is None else Path(args.out_dir)
 
 DRY = args.dry_run
@@ -57,7 +58,9 @@ if DEBUG:
     ic(args)
 
 if __name__ == "__main__":
-    ZIP = OUT_DIR / (GENOME + ".zip")
+    TMP_DIR = CWD / f"temp_{GENOME}"
+    ZIP = TMP_DIR / (GENOME + ".zip")
+
     DATASETS = split(
         f"datasets download genome accession {GENOME} --filename {ZIP} --include {INCLUDE}"
     )
@@ -70,14 +73,17 @@ if __name__ == "__main__":
         ic(UNZIP)
 
     if not DRY:
-        OUT_DIR.mkdir(parents=True, exist_ok=True)
+        TMP_DIR.mkdir(parents=True, exist_ok=True)
 
         sp.run(DATASETS, check=True)
 
         sp.run(UNZIP, check=True)
 
-        # renames
-        # removes
+        NESTED = TMP_DIR / "ncbi_dataset" / "data" / GENOME        
+        for genome_data in NESTED.iterdir():
+            shutil.move(genome_data, OUT_DIR)        
+        
+        shutil.rmtree(TMP_DIR)
 
     else:
         print("DRY RUN\nActions that would've run:\n")
