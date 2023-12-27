@@ -8,6 +8,7 @@ import os
 import shutil 
 import argparse
 import subprocess as sp
+import re
 from pathlib import Path
 from icecream import ic
 from shlex import split, join
@@ -33,6 +34,25 @@ DESCRIPTION = """Wrapper for ncbi-datasets-cli
          default [genome]
 """
 
+# An Example: 
+
+# ├── temp_GCF_024145975.1
+# │   ├── GCF_024145975.1.zip
+# │   ├── ncbi_dataset
+# │   │   └── data
+# │   │       ├── assembly_data_report.jsonl
+# │   │       ├── dataset_catalog.json
+# │   │       └── GCF_024145975.1
+# │   │           ├── cds_from_genomic.fna
+# │   │           ├── GCF_024145975.1_ASM2414597v1_genomic.fna
+# │   │           ├── genomic.gbff
+# │   │           ├── genomic.gff
+# │   │           ├── genomic.gtf
+# │   │           ├── protein.faa
+# │   │           └── sequence_report.jsonl
+# │   └── README.md
+
+
 INCLUDE_DEF = "genome,protein,gff3" 
 CWD = Path(os.getcwd())
 
@@ -48,6 +68,19 @@ args = parser.parse_args()
 
 
 GENOME = args.genome
+
+RENAMES = {"genome": (re.compile(GENOME + r"_.*_genomic\.fna$"), lambda x: re.sub(GENOME + r"_.*_genomic\.fna$", f"{GENOME}.fna", x))}#, "rna": (regex, func), "protein": (regex, func), "cds": (), "gff3": (), "gtf": (), "gbff": (), "seq-report": ()}
+
+# │   │           ├── cds_from_genomic.fna
+# │   │           ├── GCF_024145975.1_ASM2414597v1_genomic.fna
+# │   │           ├── genomic.gbff
+# │   │           ├── genomic.gff
+# │   │           ├── genomic.gtf
+# │   │           ├── protein.faa
+# │   │           └── sequence_report.jsonl
+
+
+
 OUT_DIR = CWD / GENOME if args.out_dir is None else Path(args.out_dir)
 INCLUDE = INCLUDE_DEF if args.include is None else Path(args.include)
 
@@ -67,10 +100,7 @@ if __name__ == "__main__":
     UNZIP = split(f"unzip -nq {ZIP} -d {TMP_DIR}")
 
     if DEBUG:
-        ic(ZIP)
-        ic(INCLUDE)
-        ic(DATASETS)
-        ic(UNZIP)
+        ic(GENOME, OUT_DIR, INCLUDE, CWD, TMP_DIR, ZIP, DATASETS, UNZIP)
 
     if not DRY:
         TMP_DIR.mkdir(parents=True, exist_ok=True)
@@ -80,7 +110,20 @@ if __name__ == "__main__":
 
         sp.run(UNZIP, check=True)
 
-        NESTED = TMP_DIR / "ncbi_dataset" / "data" / GENOME        
+        NESTED = TMP_DIR / "ncbi_dataset" / "data" / GENOME
+        # rename downloaded data
+        for genome_data in NESTED.iterdir():
+            for rename in RENAMES:
+                genome_data = str(genome_data)
+              
+                test = RENAMES[rename][0] 
+                sub = RENAMES[rename][1]
+                
+                if re.search(test, genome_data):
+                    shutil.move(genome_data ,sub(genome_data))
+                    break
+
+        # move downloaded data
         for genome_data in NESTED.iterdir():
             shutil.move(genome_data, OUT_DIR)        
         
@@ -91,3 +134,4 @@ if __name__ == "__main__":
         print(f"mkdir -p {OUT_DIR}")
         print(join(DATASETS))
         print(join(UNZIP))
+        print(f"rm -r {TMP_DIR}")
