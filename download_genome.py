@@ -53,7 +53,7 @@ DESCRIPTION = """Wrapper for ncbi-datasets-cli
 # │   └── README.md
 
 
-INCLUDE_DEF = "genome,protein,gff3"
+INCLUDE_DEF = ["genome", "protein", "gff3"]
 CWD = Path(os.getcwd())
 
 parser = argparse.ArgumentParser(
@@ -64,7 +64,21 @@ parser.add_argument("-o", "--out-dir", help="Default: new dir with accession num
 parser.add_argument("-n", "--dry-run", action="store_true")
 parser.add_argument("-d", "--debug", action="store_true")
 parser.add_argument(
-    "-i", "--include", help=f"Which formats to download, Default: {INCLUDE_DEF}"
+    "-i",
+    "--include",
+    nargs="*",
+    choices=[
+        "genome",
+        "rna",
+        "protein",
+        "cds",
+        "gff3",
+        "gtf",
+        "gbff",
+        "seq-report",
+        "none",
+    ],
+    help=f"Which formats to download, Default: {INCLUDE_DEF}",
 )
 parser.add_argument(
     "-r",
@@ -95,7 +109,10 @@ RENAMES = {
         r4 := re.compile(r"genomic\.gff$"),
         lambda x: re.sub(r4, f"{GENOME}.gff", x),
     ),
-    "gtf": (r5 := re.compile(r"genomic\.gtf$"), lambda x: re.sub(r5, f"{GENOME}.gtf", x)),
+    "gtf": (
+        r5 := re.compile(r"genomic\.gtf$"),
+        lambda x: re.sub(r5, f"{GENOME}.gtf", x),
+    ),
     "protein": (
         r6 := re.compile(r"protein\.faa$"),
         lambda x: re.sub(r6, f"{GENOME}.faa", x),
@@ -108,7 +125,7 @@ RENAMES = {
 
 
 OUT_DIR = CWD / GENOME if args.out_dir is None else Path(args.out_dir)
-INCLUDE = INCLUDE_DEF if args.include is None else Path(args.include)
+INCLUDE = ",".join(INCLUDE_DEF) if args.include is None else ",".join(args.include)
 
 DRY = args.dry_run
 DEBUG = args.debug
