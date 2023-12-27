@@ -4,6 +4,7 @@
 # Install with
 # mamba install -y -c conda-forge ncbi-datasets-cli
 
+import os
 import argparse
 import subprocess as sp
 from pathlib import Path
@@ -32,6 +33,7 @@ DESCRIPTION = """Wrapper for ncbi-datasets-cli
 """
 
 INCLUDE_DEF = "genome,protein,gff3" 
+CWD = Path(os.getcwd())
 
 parser = argparse.ArgumentParser(
     description=DESCRIPTION, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -45,7 +47,7 @@ args = parser.parse_args()
 
 
 GENOME = args.genome
-OUT_DIR = Path(GENOME) if args.out_dir is None else Path(args.out_dir)
+OUT_DIR = CWD / f"temp_{GENOME}" if args.out_dir is None else Path(args.out_dir)
 INCLUDE = INCLUDE_DEF if args.include is None else Path(args.out_dir)
 
 DRY = args.dry_run
@@ -74,7 +76,7 @@ if __name__ == "__main__":
 
         sp.run(UNZIP, check=True)
 
-        # remames
+        # renames
         # removes
 
     else:
