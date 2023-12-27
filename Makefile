@@ -10,3 +10,6 @@ data:
 style:
 	Rscript -e 'styler::style_dir("./")'
 	black ./
+
+README.md: README.org
+	pandoc -o README.md README.org
