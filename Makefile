@@ -1,6 +1,6 @@
 .PHONY neighbors:
 neighbors:
-	Rscript get_neighbors.R
+	/usr/bin/Rscript get_neighbors.R
 
 .PHONY data:
 data:
