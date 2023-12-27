@@ -49,7 +49,7 @@ args = parser.parse_args()
 
 GENOME = args.genome
 OUT_DIR = CWD / GENOME if args.out_dir is None else Path(args.out_dir)
-INCLUDE = INCLUDE_DEF if args.include is None else Path(args.out_dir)
+INCLUDE = INCLUDE_DEF if args.include is None else Path(args.include)
 
 DRY = args.dry_run
 DEBUG = args.debug
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     DATASETS = split(
         f"datasets download genome accession {GENOME} --filename {ZIP} --include {INCLUDE}"
     )
-    UNZIP = split(f"unzip -nq {ZIP} -d {OUT_DIR}")
+    UNZIP = split(f"unzip -nq {ZIP} -d {TMP_DIR}")
 
     if DEBUG:
         ic(ZIP)
@@ -74,6 +74,7 @@ if __name__ == "__main__":
 
     if not DRY:
         TMP_DIR.mkdir(parents=True, exist_ok=True)
+        OUT_DIR.mkdir(parents=True, exist_ok=True)
 
         sp.run(DATASETS, check=True)
 
