@@ -80,29 +80,29 @@ GENOME = args.genome
 
 RENAMES = {
     "genome": (
-        r := re.compile(GENOME + r"_.*_genomic\.fna$"),
-        lambda x: re.sub(r, f"{GENOME}.fna", x),
+        r1 := re.compile(GENOME + r"_.*_genomic\.fna$"),
+        lambda x: re.sub(r1, f"{GENOME}.fna", x),
     ),
     "cds": (
-        r := re.compile(r"cds_from_genomic\.fna$"),
-        lambda x: re.sub(r, f"{GENOME}_cds.fna", x),
+        r2 := re.compile(r"cds_from_genomic\.fna$"),
+        lambda x: re.sub(r2, f"{GENOME}_cds.fna", x),
     ),
     "gbff": (
-        r := re.compile(r"genomic\.gbff$"),
-        lambda x: re.sub(r, f"{GENOME}.gbff", x),
+        r3 := re.compile(r"genomic\.gbff$"),
+        lambda x: re.sub(r3, f"{GENOME}.gbff", x),
     ),
     "gff3": (
-        r := re.compile(r"genomic\.gff$"),
-        lambda x: re.sub(r, f"{GENOME}.gff", x),
+        r4 := re.compile(r"genomic\.gff$"),
+        lambda x: re.sub(r4, f"{GENOME}.gff", x),
     ),
-    "gtf": (r := re.compile(r"genomic\.gtf$"), lambda x: re.sub(r, f"{GENOME}.gtf", x)),
+    "gtf": (r5 := re.compile(r"genomic\.gtf$"), lambda x: re.sub(r5, f"{GENOME}.gtf", x)),
     "protein": (
-        r := re.compile(r"protein\.faa$"),
-        lambda x: re.sub(r, f"{GENOME}.faa", x),
+        r6 := re.compile(r"protein\.faa$"),
+        lambda x: re.sub(r6, f"{GENOME}.faa", x),
     ),
     "sequence-report": (
-        r := re.compile(r"sequence_report\.jsonl$"),
-        lambda x: re.sub(r, f"{GENOME}.jsonl", x),
+        r7 := re.compile(r"sequence_report\.jsonl$"),
+        lambda x: re.sub(r7, f"{GENOME}.jsonl", x),
     ),
 }
 
