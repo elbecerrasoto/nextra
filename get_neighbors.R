@@ -13,8 +13,27 @@
 library(tidyverse)
 library(stringr)
 
-CDS <- microseq::readGFF("GCF_000699465.1/GCF_000699465.1_bsubJH642.gff") |>  filter(Type=="CDS")
+CDS <- microseq::readGFF("GCF_000699465.1/GCF_000699465.1_bsubJH642.gff") |> filter(Type == "CDS")
 
-  
+
+CDS_ATTS_HEADERS <- c(
+  "ID",
+  "Parent",
+  "Dbxref",
+  "Name",
+  "Ontology_term",
+  "gbkey",
+  "gene",
+  "go_component",
+  "go_function",
+  "go_process",
+  "inference",
+  "locus_tag",
+  "procuct",
+  "protein_id",
+  "transl_table"
+)
+
+
 # attributes targets
 # str_detect("hello", "llo")

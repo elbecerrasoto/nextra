@@ -80,7 +80,9 @@ parser.add_argument(
     ],
     help=f"Which formats to download, Default: {INCLUDE_DEF}",
 )
-parser.add_argument("-p", "--particle", help="Rename particle, Default: genome NCBI accession")
+parser.add_argument(
+    "-p", "--particle", help="Rename particle, Default: genome NCBI accession"
+)
 parser.add_argument(
     "-r",
     "--no-rename",
