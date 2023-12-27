@@ -13,7 +13,12 @@
 library(tidyverse)
 library(stringr)
 
-CDS <- microseq::readGFF("GCF_000699465.1/GCF_000699465.1_bsubJH642.gff") |> filter(Type == "CDS")
+GFF <- "GCF_000699465.1/GCF_000699465.1_bsubJH642.gff"
+
+CDS <- microseq::readGFF(GFF) |> filter(Type == "CDS")
+
+Rgff::gff_stats(GFF)
+Rgff::get_features(GFF)
 
 
 CDS_ATTS_HEADERS <- c(
