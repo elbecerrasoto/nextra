@@ -42,39 +42,85 @@ Rgff::get_features(GFF)
 CDS <- segmenTools::gff2tab(GFF) |>
   tibble() |>
   filter(feature == "CDS") |>
-  select_if(function(x) !(all(is.na(x)) | all(x == ""))) |> # remove empty cols https://stackoverflow.com/questions/49374887/piping-the-removal-of-empty-columns-using-dplyr
-  relocate(gene, locus_tag, start, end, feature, Parent, product, seqname, strand, frame) |>
-  arrange(start) |> # definition of neighbor
-  mutate(row = 1:nrow(CDS)) |>
-  relocate(row)
+  select_if(function(x) !(all(is.na(x)) | all(x == ""))) |> # remove empty cols stackoverflow 49374887
+  relocate(gene, locus_tag, start, end, feature, product, seqname, strand, frame)
+
+
+# definition of neighbor
+CDS <- CDS |>
+  arrange(start) |>
+  mutate(order = 1:nrow(CDS)) |>
+  relocate(order)
 
 
 print(head(CDS))
 names(CDS)
 
-# Search Neighbors --------------------------------------------------------
 
-circular_index <- function(idx, size) {
+# Search Neighbors Functions ----------------------------------------------
+
+
+circ <- function(idx, size) {
+  # circular_index
   # In R indexes start on 1
   ((idx - 1) %% size) + 1
 }
 
+circ(-2, 3)
 
 get_match_position <- function(target, genome) {
   x <- genome |>
-    mutate(row = 1:nrow(genome)) |>
-    relocate(row) |>
     filter(locus_tag == target)
-
-  return(as.numeric(x$row))
+  as.numeric(x$order)
 }
 
+get_match_position(TO_SEARCH[1], CDS)
 
 neighbor_seq <- function(N) {
   c(seq(N, 1, -1), 0, seq(1, N, 1))
 }
 
+neighbor_seq(4)
 
-find_neighbors_by_locus_tag <- function(target, N, genome) {
-  get_match_position()
+
+find_neighbors <- function(target, N, genome) {
+  idx <- get_match_position(target, genome)
+  R <- nrow(genome)
+
+  start <- idx - N
+  if (start < 1) {
+    start_oflow <- TRUE
+  } else {
+    start_oflow <- FALSE
+  }
+
+  end <- idx + N
+  if (end > R) {
+    end_oflow <- TRUE
+  } else {
+    end_oflow <- FALSE
+  }
+
+  end <- (idx + N)
+
+  if (!start_oflow && !end_oflow) {
+    x <- genome[start:end, ]
+  } else {
+    cstart <- circ(start, R)
+    cend <- circ(end, R)
+
+    cbind(genome[cstart:R, ], genome[1:cend, ])
+  }
+
+
+  x |>
+    mutate(neighbor_n = neighbor_seq(N)) |>
+    relocate(neighbor_n) |>
+    select(neighbor_n, order, gene, locus_tag, start, end, feature, product, seqname, strand, frame)
 }
+
+
+# Run ---------------------------------------------------------------------
+
+write_tsv(find_neighbors(TO_SEARCH[1], 16, CDS), "ywqJ.tsv")
+write_tsv(find_neighbors(TO_SEARCH[2], 16, CDS), "ywqL.tsv")
