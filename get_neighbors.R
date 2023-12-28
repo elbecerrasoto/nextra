@@ -47,6 +47,8 @@ CDS <- segmenTools::gff2tab(GFF) |>
 print(head(CDS))
 
 
+
+
 # Search Neighbors --------------------------------------------------------
 
 circular_index <- function(idx, size) {
@@ -54,4 +56,40 @@ circular_index <- function(idx, size) {
   ((idx - 1) %% size) + 1
 }
 
-circular_index(0, 10)
+
+# Get match objects
+# ywqJ Deaminase toxin gene
+# locus-tag BSUA_RS19530
+
+# ywqL Endo V gene
+# BSUA_RS19520
+
+search_by_locus_tag <- function(ilocus_tag) {
+  x <- CDS |>
+    mutate(row = 1:nrow(CDS)) |>
+    relocate(row) |>
+    filter(locus_tag == ilocus_tag)
+
+  return(as.numeric(x$row))
+}
+
+to_search <- c("BSUA_RS19530", "BSUA_RS19520")
+
+map(to_search, search_by_locus_tag)
+
+# What is my output ...
+# something tidy
+
+neighbor_seq <- function(N) {
+  c(seq(4, 1, -1), 0, seq(1, 4, 1))
+}
+sequence(39, 0, -1)
+?seq
+?sequence
+
+
+c(seq(4, 1, -1), 0, seq(1, 4, 1))
+
+find_neighbors_by_locus_tag <- function(tag, n, genome) {
+  srta
+}
