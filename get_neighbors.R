@@ -24,12 +24,34 @@ Rgff::check_gff(GFF)
 Rgff::gff_stats(GFF)
 Rgff::get_features(GFF)
 
+
+# Definition of Neighbor --------------------------------------------------
+
+
+# What is the definition of a neighbor?
+# Same feature type, same strand?
+# Mutually Exclusive?
+# The table gets filter and ordered, to define the neighbors
+
+
 # https://stackoverflow.com/questions/49374887/piping-the-removal-of-empty-columns-using-dplyr # remove NA columns
 CDS <- segmenTools::gff2tab(GFF) |>
   tibble() |>
   filter(feature == "CDS") |>
   select_if(function(x) !(all(is.na(x)) | all(x == ""))) |>
-  relocate(gene, locus_tag, start, end, feature) |>
+  relocate(gene, locus_tag, start, end, feature, seqname, strand, frame) |>
   arrange(start)
 
+
+# write_tsv(CDS, "cds.tsv")
 print(head(CDS))
+
+
+# Search Neighbors --------------------------------------------------------
+
+circular_index <- function(idx, size) {
+  # In R indexes start on 1
+  ((idx - 1) %% size) + 1
+}
+
+circular_index(0, 10)
