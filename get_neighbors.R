@@ -2,24 +2,25 @@
 
 # Bacillus subtillis JH462
 
-# ywqJ Deaminase toxin gene
-# locus-tag BSUA_RS19530
+# Getting Neighbors of the following genes:
 
-# ywqL Endo V gene
-# BSUA_RS19520
+# ywqJ Deaminase toxin locus tag: BSUA_RS19530
+# ywqL Endo V          locus tag: BSUA_RS19520
 
-# ./download_genome.py -i gff3 protein genome 'seq-report' cds -p GCF_000699465.1_bsubJH642 GCF_000699465.1
+# Get the GFF
+# ./download_genome.py -i gff3 -p GCF_000699465.1_bsubJH642 GCF_000699465.1
+
+
+N <- 2^4 # Number of Neighbors per direction
+TO_SEARCH <- c("BSUA_RS19530", "BSUA_RS19520") # locus tag to search
+GFF <- "GCF_000699465.1/GCF_000699465.1_bsubJH642.gff"
 
 library(tidyverse)
 library(stringr)
 library(segmenTools)
 # devtools::install_github("raim/segmenTools")
 
-N <- 2^3
-GFF <- "GCF_000699465.1/GCF_000699465.1_bsubJH642.gff"
-
-# CDS <- microseq::readGFF(GFF) |> filter(Type == "CDS") |> arrange(Start)
-
+# GFF quality
 Rgff::check_gff(GFF)
 Rgff::gff_stats(GFF)
 Rgff::get_features(GFF)
@@ -30,24 +31,26 @@ Rgff::get_features(GFF)
 
 # What is the definition of a neighbor?
 # Same feature type, same strand?
+# CDS vs gene
 # Mutually Exclusive?
 # The table gets filter and ordered, to define the neighbors
 
+# For now the definition is a CDS, doesn't matter the strand
+# Contiguos by start position
 
-# https://stackoverflow.com/questions/49374887/piping-the-removal-of-empty-columns-using-dplyr # remove NA columns
+
 CDS <- segmenTools::gff2tab(GFF) |>
   tibble() |>
   filter(feature == "CDS") |>
-  select_if(function(x) !(all(is.na(x)) | all(x == ""))) |>
-  relocate(gene, locus_tag, start, end, feature, seqname, strand, frame) |>
-  arrange(start)
+  select_if(function(x) !(all(is.na(x)) | all(x == ""))) |> # remove empty cols https://stackoverflow.com/questions/49374887/piping-the-removal-of-empty-columns-using-dplyr
+  relocate(gene, locus_tag, start, end, feature, Parent, product, seqname, strand, frame) |>
+  arrange(start) |> # definition of neighbor
+  mutate(row = 1:nrow(CDS)) |>
+  relocate(row)
 
 
-# write_tsv(CDS, "cds.tsv")
 print(head(CDS))
-
-
-
+names(CDS)
 
 # Search Neighbors --------------------------------------------------------
 
@@ -57,39 +60,21 @@ circular_index <- function(idx, size) {
 }
 
 
-# Get match objects
-# ywqJ Deaminase toxin gene
-# locus-tag BSUA_RS19530
-
-# ywqL Endo V gene
-# BSUA_RS19520
-
-search_by_locus_tag <- function(ilocus_tag) {
-  x <- CDS |>
-    mutate(row = 1:nrow(CDS)) |>
+get_match_position <- function(target, genome) {
+  x <- genome |>
+    mutate(row = 1:nrow(genome)) |>
     relocate(row) |>
-    filter(locus_tag == ilocus_tag)
+    filter(locus_tag == target)
 
   return(as.numeric(x$row))
 }
 
-to_search <- c("BSUA_RS19530", "BSUA_RS19520")
-
-map(to_search, search_by_locus_tag)
-
-# What is my output ...
-# something tidy
 
 neighbor_seq <- function(N) {
-  c(seq(4, 1, -1), 0, seq(1, 4, 1))
+  c(seq(N, 1, -1), 0, seq(1, N, 1))
 }
-sequence(39, 0, -1)
-?seq
-?sequence
 
 
-c(seq(4, 1, -1), 0, seq(1, 4, 1))
-
-find_neighbors_by_locus_tag <- function(tag, n, genome) {
-  srta
+find_neighbors_by_locus_tag <- function(target, N, genome) {
+  get_match_position()
 }
